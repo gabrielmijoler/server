@@ -45,14 +45,14 @@ const userType = new GraphQLObjectType({
         posts: {
             type: new GraphQLList(PostType),
             resolve(parent, args) {
-                return Post.find({userId: parent.id})
+                return Post.find({ userId: parent.id })
             }
         },
 
         hobbies: {
             type: new GraphQLList(HobbyType),
             resolve(parent, args) {
-                return Hobby.find({userId: parent.id})
+                return Hobby.find({ userId: parent.id })
             }
         }
     })
@@ -105,7 +105,7 @@ const RootQuery = new GraphQLObjectType({
             }
         },
 
-        users:{
+        users: {
             type: new GraphQLList(userType),
             resolve(parent, args) {
                 return userData;
@@ -121,7 +121,7 @@ const RootQuery = new GraphQLObjectType({
             }
         },
 
-        hobbys:{
+        hobbys: {
             type: new GraphQLList(HobbyType),
             resolve(parent, args) {
                 return HobbyData;
@@ -135,7 +135,7 @@ const RootQuery = new GraphQLObjectType({
                 return _.find(postData, { id: args.id })
             }
         },
-        posts:{
+        posts: {
             type: new GraphQLList(PostType),
             resolve(parent, args) {
                 return postData;
@@ -152,7 +152,7 @@ const Mutation = new GraphQLObjectType({
             args: {
                 // id: { type: GraphQLID },
                 name: { type: new GraphQLNonNull(GraphQLString) },
-                age: { type: new GraphQLNonNull(GraphQLInt)},
+                age: { type: new GraphQLNonNull(GraphQLInt) },
                 profession: { type: GraphQLString },
             },
             resolve(parent, args) {
@@ -165,28 +165,43 @@ const Mutation = new GraphQLObjectType({
             }
         },
 
-        UpdateUser:{
+        UpdateUser: {
             type: userType,
-            args:{
-                id:{type: new GraphQLNonNull(GraphQLString)},
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) },
                 name: { type: new GraphQLNonNull(GraphQLString) },
-                age: { type: new GraphQLNonNull(GraphQLInt)},
+                age: { type: new GraphQLNonNull(GraphQLInt) },
                 profession: { type: GraphQLString },
                 resolve(parent, args) {
-                    return updateUser = User.findByIdAndUpdate(
+                    return (updateUser = User.findByIdAndUpdate(
                         args.id,
                         {
-                            $set:{
-                                name:args.name,
+                            $set: {
+                                name: args.name,
                                 age: args.age,
                                 profession: args.profession
                             },
                         },
-                        {new: true}
-                    );
+                        { new: true }
+                    ));
                 }
             }
         },
+
+        DeleteUser: {
+            type: userType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve(parent, args) {
+                let deleteUser = User.findByIdAndRemove(args.id).exec()
+                if (!deleteUser) {
+                    throw new "Error"();
+                }
+                return deleteUser;
+            }
+        },
+
         createPost: {
             type: PostType,
             args: {
@@ -203,32 +218,48 @@ const Mutation = new GraphQLObjectType({
 
             }
         },
-        UpdatePost:{
+        UpdatePost: {
             type: PostType,
-            args:{
-                id:{type: new GraphQLNonNull(GraphQLString)},
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) },
                 comment: { type: new GraphQLNonNull(GraphQLString) },
                 userId: { type: GraphQLID }
             },
             resolve(parent, args) {
-                return updatePost = Post.findByIdAndUpdate(
+                return (updatePost = Post.findByIdAndUpdate(
                     args.id,
                     {
-                        $set:{
-                            comment:args.comment,
+                        $set: {
+                            comment: args.comment,
                         },
                     },
-                    {new: true}
-                );
+                    { new: true }
+                ));
+            },
+        },
+
+        DeletePost: {
+            type: PostType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve(parent, args) {
+                let deletePost = User.findByIdAndRemove(args.id).exec()
+                if (!deletePost) {
+                    throw new "Error"()
+                }
+                return deletePost;
             }
         },
+
+
         createHobbie: {
             type: HobbyType,
             args: {
                 // id: { type: GraphQLID },
-                title: { type: new GraphQLNonNull (GraphQLString) },
-                description: { type: new GraphQLNonNull (GraphQLString) },
-                userId: { type: new GraphQLNonNull (GraphQLID) },
+                title: { type: new GraphQLNonNull(GraphQLString) },
+                description: { type: new GraphQLNonNull(GraphQLString) },
+                userId: { type: new GraphQLNonNull(GraphQLID) },
             },
             resolve(parent, args) {
                 let MutationHobbies = Hobby({
@@ -241,25 +272,38 @@ const Mutation = new GraphQLObjectType({
             }
         },
 
-        UpdateHobbies:{
+        UpdateHobbies: {
             type: HobbyType,
-            args:{
-                id:{type: new GraphQLNonNull(GraphQLString)},
-                title: { type: new GraphQLNonNull (GraphQLString) },
-                description: { type: new GraphQLNonNull (GraphQLString) },
-                userId: { type: new GraphQLNonNull (GraphQLID) },
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) },
+                title: { type: new GraphQLNonNull(GraphQLString) },
+                description: { type: new GraphQLNonNull(GraphQLString) },
+                userId: { type: new GraphQLNonNull(GraphQLID) },
             },
             resolve(parent, args) {
-                return updateHobbies = Hobby.findByIdAndUpdate(
+                return (updateHobbies = Hobby.findByIdAndUpdate(
                     args.id,
                     {
-                        $set:{
-                            title:args.title,
-                            description:args.description,
+                        $set: {
+                            title: args.title,
+                            description: args.description,
                         },
                     },
-                    {new: true}
-                );
+                    { new: true }
+                ));
+            }
+        },
+        DeleteHobbies: {
+            type: HobbyType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve(parent, args) {
+                let deleteHobby = User.findByIdAndRemove(args.id).exec()
+                if (!deleteHobby) {
+                    throw new "Error"();
+                }
+                return deleteHobby;
             }
         },
 
